@@ -88,7 +88,7 @@ class DiffusionModule(nn.Module):
         # Compute xt.
         alphas_prod_t = extract(self.var_scheduler.alphas_cumprod, t, x0)
         xt = x0
-        xt = (torch.sqrt(alphas_prod_t) * x0) + (torch.sqrt(1 - alphas_prod_t)
+        xt = (torch.sqrt(alphas_prod_t) * x0) + (torch.sqrt(1 - alphas_prod_t) * noise)
         #######################
 
         return xt
@@ -108,6 +108,8 @@ class DiffusionModule(nn.Module):
         # compute x_t_prev.
         if isinstance(t, int):
             t = torch.tensor([t]).to(self.device)
+        else:
+            t = t.to(self.device)
         eps_factor = (1 - extract(self.var_scheduler.alphas, t, xt)) / (
             1 - extract(self.var_scheduler.alphas_cumprod, t, xt)
         ).sqrt()
@@ -118,7 +120,7 @@ class DiffusionModule(nn.Module):
         t_prev      = (t - 1).clamp(min=0)
         alpha_bar_t_prev = extract(self.var_scheduler.alphas_cumprod, t_prev, xt) # \bar{α}_{t-1}
 
-       # 1. predict noise
+        # 1. predict noise
         eps_pred = self.network(xt, t)
         # 2. Posterior mean
         mean = (1/torch.sqrt(alpha_t))*(xt-eps_factor*eps_pred)

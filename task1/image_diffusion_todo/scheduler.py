@@ -258,7 +258,7 @@ class DDPMScheduler(BaseScheduler):
             eps: (`torch.Tensor [B,C,H,W]`): injected noise.
         """
         
-         if eps is None:
+        if eps is None:
             eps       = torch.randn(x_0.shape, device=x_0.device)
 
         ######## TODO ########
